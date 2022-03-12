@@ -3,8 +3,10 @@ read -p "Enter port number: " port_number
 read -p "Enter template name: " tname
 f1=$tname.tpl
 f2=$tname.stpl
-pn="3000"
-
+#pn="3000"
+header1='$proxy_add_x_forwarded_for'
+header2='$host'
+header3='$http_upgrade'
 cat <<EOT >> $f1
 #=========================================================================#
 # This template modified by erdee proxy script                            #
@@ -22,11 +24,11 @@ server {
     include %home%/%user%/conf/web/%domain%/nginx.forcessl.conf*;
 
    location / {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-        proxy_pass http://localhost:3000;
+        proxy_set_header X-Forwarded-For $header1;
+        proxy_set_header Host $header2;
+        proxy_pass http://localhost:$port_number;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade $header3;
         proxy_set_header Connection "upgrade";
     }
 
@@ -73,11 +75,11 @@ server {
     include %home%/%user%/conf/web/%domain%/nginx.hsts.conf*;
 
     location / {
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header Host $host;
-        proxy_pass http://localhost:3000;
+        proxy_set_header X-Forwarded-For $header1;
+        proxy_set_header Host $header2;
+        proxy_pass http://localhost:$port_number;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Upgrade $header3;
         proxy_set_header Connection "upgrade";
     }
 
@@ -112,4 +114,3 @@ fi
 
 sudo mv $tname.* /usr/local/hestia/data/templates/web/nginx/php-fpm
 echo "Moving Done."
-
